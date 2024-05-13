@@ -1,0 +1,24 @@
+---
+version: '3.8'
+services:
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql_db
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=logistic
+      - MYSQL_ROOT_PASSWORD=u123FJf5dhRMa21
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - hadoop_network
+
+networks:
+  hadoop_network:
+    name: hadoop_network
+    external: true

@@ -1,0 +1,7 @@
+fsspec
+pyarrow
+hdfs3
+openpyxl
+xlrd
+numpy
+pandas

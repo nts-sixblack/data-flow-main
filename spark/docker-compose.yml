@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  spark-master:
+    image: spark-base:3.5
+    container_name: spark-master
+    restart: always
+    ports:
+      - "9090:8081"
+      - "7077:7077"
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+    environment:
+      - SPARK_LOCAL_IP=spark-master
+      - SPARK_WORKLOAD=master
+    networks:
+      - hadoop_network
+    command: /bin/sh -c "./start-spark.sh"
+
+  spark-worker-a:
+    image: spark-base:3.5
+    container_name: spark-worker-a
+    restart: always
+    ports:
+      - "9091:8081"
+      - "7002:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=3G
+      - SPARK_DRIVER_MEMORY=3G
+      - SPARK_EXECUTOR_MEMORY=3G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-a
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+    networks:
+      - hadoop_network
+    command: /bin/sh -c "./start-spark.sh"
+
+  spark-worker-b:
+    image: spark-base:3.5
+    container_name: spark-worker-b
+    restart: always
+    ports:
+      - "9092:8081"
+      - "7001:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=3G
+      - SPARK_DRIVER_MEMORY=3G
+      - SPARK_EXECUTOR_MEMORY=3G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-b
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+    networks:
+      - hadoop_network
+    command: /bin/sh -c "./start-spark.sh"
+
+networks:
+  hadoop_network:
+    name: hadoop_network
+    external: true
